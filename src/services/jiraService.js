@@ -2,11 +2,20 @@ import api from '../api/axios';
 
 const jiraApi = api;
 
+// Log all environment variables at startup
+console.log('Environment variables:', {
+  API_URL: import.meta.env.VITE_API_URL,
+  JIRA_DOMAIN: import.meta.env.VITE_JIRA_DOMAIN,
+  JIRA_PROJECT_KEY: import.meta.env.VITE_JIRA_PROJECT_KEY,
+  // Don't log sensitive information like API tokens
+});
+
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
-    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY?.replace(/['"]/g, '');
+    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY;
+    
     if (!projectKey) {
-      throw new Error('Project key is not configured');
+      throw new Error(`Project key is not configured. Current value: ${projectKey}`);
     }
 
     console.log('Creating ticket with project key:', projectKey);
@@ -68,12 +77,11 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     console.log('Jira response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating Jira ticket:', error.response?.data || error.message);
-    console.error('Full error object:', error);
-    
-    if (error.response?.data?.errors?.project) {
-      throw new Error(`Project configuration error: ${error.response.data.errors.project}`);
-    }
+    console.error('Error creating Jira ticket:', {
+      message: error.message,
+      response: error.response?.data,
+      projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY
+    });
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
 };
