@@ -4,10 +4,18 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/b-forms-client/',
+  base: './',
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+        assetFileNames: 'assets/[name].[ext]',
+        chunkFileNames: 'assets/[name].js',
+        entryFileNames: 'assets/[name].js',
+      },
+    },
   },
   resolve: {
     alias: {
