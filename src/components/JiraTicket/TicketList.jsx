@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { getUserTickets } from '../../services/jiraService';
-import { useAuth } from '../../contexts/AuthContext';
+import { selectUser } from '../../store/slices/authSlice';
 import { toast } from 'react-toastify';
 import './TicketList.css';
 
 const TicketList = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectUser);
   const [tickets, setTickets] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);

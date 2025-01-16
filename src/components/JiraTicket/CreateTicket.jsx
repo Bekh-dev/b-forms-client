@@ -2,41 +2,52 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { createJiraTicket } from '../../services/jiraService';
 import { selectUser } from '../../store/slices/authSlice';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 const CreateTicket = ({ open, setOpen }) => {
   const user = useSelector(selectUser);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     summary: '',
     description: '',
     priority: 'Medium'
   });
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
+    if (!user?.email) {
+      toast.error('Please log in to create a ticket');
+      return;
+    }
 
+    setLoading(true);
     try {
       await createJiraTicket({
         ...formData,
         reporter: user.email,
         pageUrl: window.location.href
       });
-      toast.success('Ticket created successfully');
+      toast.success('Ticket created successfully!');
+      setFormData({
+        summary: '',
+        description: '',
+        priority: 'Medium'
+      });
       setOpen(false);
-    } catch (err) {
-      toast.error(err.message || 'Failed to create ticket');
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      toast.error(error.message || 'Failed to create ticket');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   if (!open) return null;
@@ -100,16 +111,16 @@ const CreateTicket = ({ open, setOpen }) => {
               type="button"
               onClick={() => setOpen(false)}
               className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors"
-              disabled={isLoading}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-md transition-colors disabled:opacity-50"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? 'Creating...' : 'Create Ticket'}
+              {loading ? 'Creating...' : 'Create Ticket'}
             </button>
           </div>
         </form>
