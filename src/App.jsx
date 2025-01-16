@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUser, selectIsAuthenticated } from './store/slices/authSlice';
 import { Toaster } from 'react-hot-toast';
@@ -30,7 +30,7 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <Router>
+    <Router basename="/b-forms-client">
       <Toaster position="top-right" />
       <Routes>
         <Route
