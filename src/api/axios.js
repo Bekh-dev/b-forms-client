@@ -21,7 +21,8 @@ api.interceptors.request.use(
       url: config.url,
       method: config.method,
       data: config.data,
-      headers: config.headers
+      headers: config.headers,
+      baseURL: config.baseURL
     });
     
     return config;
@@ -48,8 +49,10 @@ api.interceptors.response.use(
     console.error('Response error:', {
       status: error.response?.status,
       data: error.response?.data,
-      message: error.message
+      message: error.message,
+      config: error.config
     });
+    
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
