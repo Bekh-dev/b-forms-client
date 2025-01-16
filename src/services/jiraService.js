@@ -15,6 +15,19 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
   try {
     const projectKey = config.jira.projectKey;
     
+    console.log('Jira Config:', {
+      domain: config.jira.domain,
+      email: config.jira.email,
+      projectKey: config.jira.projectKey,
+      hasToken: !!config.jira.apiToken,
+      envVars: {
+        domain: import.meta.env.VITE_JIRA_DOMAIN,
+        email: import.meta.env.VITE_JIRA_EMAIL,
+        projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
+        hasToken: !!import.meta.env.VITE_JIRA_API_TOKEN
+      }
+    });
+
     if (!projectKey) {
       throw new Error(`Project key is not configured. Current value: ${projectKey}`);
     }
@@ -91,7 +104,13 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
       message: error.message,
       response: error.response?.data,
       projectKey: config.jira.projectKey,
-      hasToken: !!config.jira.apiToken
+      hasToken: !!config.jira.apiToken,
+      envVars: {
+        domain: import.meta.env.VITE_JIRA_DOMAIN,
+        email: import.meta.env.VITE_JIRA_EMAIL,
+        projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
+        hasToken: !!import.meta.env.VITE_JIRA_API_TOKEN
+      }
     });
     
     if (error.response?.data?.errorMessages?.length > 0) {
@@ -110,6 +129,7 @@ export const getUserTickets = async (email, startAt = 0) => {
         startAt
       }
     });
+    console.log('Jira response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching tickets:', error);
