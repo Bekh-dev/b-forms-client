@@ -10,21 +10,32 @@ const TicketList = () => {
   const [tickets, setTickets] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
       if (!user?.email) {
         setLoading(false);
+        setError('Please log in to view tickets');
         return;
       }
 
       try {
+        console.log('Fetching tickets for user:', user.email);
         const response = await getUserTickets(user.email);
-        setTickets(response.tickets);
-        setTotal(response.total);
+        console.log('Tickets response:', response);
+        
+        if (!response) {
+          throw new Error('No response from server');
+        }
+
+        setTickets(response.tickets || []);
+        setTotal(response.total || 0);
+        setError(null);
       } catch (error) {
         console.error('Error fetching tickets:', error);
-        toast.error('Failed to fetch tickets');
+        setError(error.message || 'Failed to fetch tickets');
+        toast.error(error.message || 'Failed to fetch tickets');
       } finally {
         setLoading(false);
       }
@@ -34,15 +45,28 @@ const TicketList = () => {
   }, [user?.email]);
 
   if (loading) {
-    return <div className="ticket-list-loading">Loading tickets...</div>;
+    return (
+      <div className="ticket-list-container">
+        <div className="ticket-list-loading">Loading tickets...</div>
+      </div>
+    );
   }
 
-  if (!user?.email) {
-    return <div className="ticket-list-error">Please log in to view tickets</div>;
+  if (error) {
+    return (
+      <div className="ticket-list-container">
+        <div className="ticket-list-error">{error}</div>
+      </div>
+    );
   }
 
-  if (tickets.length === 0) {
-    return <div className="ticket-list-empty">No tickets found</div>;
+  if (!tickets || tickets.length === 0) {
+    return (
+      <div className="ticket-list-container">
+        <h2>Your Support Tickets (0)</h2>
+        <div className="ticket-list-empty">No tickets found</div>
+      </div>
+    );
   }
 
   return (
@@ -61,10 +85,12 @@ const TicketList = () => {
               Status: <span className={`status-${ticket.status?.toLowerCase()}`}>{ticket.status}</span>
             </div>
             <div className="ticket-dates">
-              <div>Created: {ticket.created}</div>
-              <div>Updated: {ticket.updated}</div>
+              <div>Created: {new Date(ticket.created).toLocaleString()}</div>
+              <div>Updated: {new Date(ticket.updated).toLocaleString()}</div>
             </div>
-            <div className="ticket-description">{ticket.description}</div>
+            {ticket.description && (
+              <div className="ticket-description">{ticket.description}</div>
+            )}
           </div>
         ))}
       </div>

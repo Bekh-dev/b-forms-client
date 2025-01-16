@@ -1,4 +1,6 @@
-import api from '../api/axios';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const createJiraTicket = async ({ summary, description, reporter, pageUrl, priority = 'Medium' }) => {
   try {
@@ -12,36 +14,29 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
 
     console.log('Creating ticket with data:', data);
 
-    const response = await api.post('/api/jira/tickets', data);
+    const response = await axios.post(`${API_URL}/jira/tickets`, data, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   } catch (error) {
-    console.error('Error creating Jira ticket:', {
-      message: error.message,
-      response: error.response?.data
-    });
-    
-    if (error.response?.data?.errorMessages?.length > 0) {
-      throw new Error(error.response.data.errorMessages[0]);
-    }
-    
-    if (error.response?.data?.errors) {
-      const errorMessages = Object.entries(error.response.data.errors)
-        .map(([field, message]) => `${field}: ${message}`)
-        .join(', ');
-      throw new Error(`Validation errors: ${errorMessages}`);
-    }
-    
+    console.error('Error creating Jira ticket:', error.response?.data || error.message);
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
 };
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
-    const response = await api.get(`/api/jira/tickets/${email}`, {
+    console.log('Fetching tickets for email:', email);
+    const response = await axios.get(`${API_URL}/jira/tickets/${encodeURIComponent(email)}`, {
       params: {
         startAt
-      }
+      },
+      withCredentials: true
     });
+    console.log('API Response:', response.data);
 
     // Преобразуем данные в нужный формат
     return {
@@ -58,7 +53,7 @@ export const getUserTickets = async (email, startAt = 0) => {
       }))
     };
   } catch (error) {
-    console.error('Error fetching tickets:', error);
-    throw new Error('Failed to fetch tickets');
+    console.error('Error fetching tickets:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || error.message || 'Failed to fetch tickets');
   }
 };
