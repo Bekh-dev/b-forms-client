@@ -21,13 +21,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          npm install -g pnpm
+          pnpm install --no-frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
           VITE_JIRA_DOMAIN: ${{ secrets.VITE_JIRA_DOMAIN }}
@@ -37,6 +38,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
+        if: success()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
