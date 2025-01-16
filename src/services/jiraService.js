@@ -66,10 +66,6 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
         priority: {
           name: priority
         }
-      },
-      auth: {
-        email: config.jira.email,
-        apiToken: config.jira.apiToken
       }
     };
 
