@@ -17,6 +17,8 @@ import EditTemplate from './pages/Templates/EditTemplate';
 import UseTemplate from './pages/Templates/UseTemplate';
 import ViewResponses from './pages/Templates/ViewResponses';
 import SupportTickets from './pages/Profile/SupportTickets';
+import CreateTicket from './components/JiraTicket/CreateTicket';
+import TicketList from './components/JiraTicket/TicketList';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -56,7 +58,14 @@ const App = () => {
             <Route path="use/:id" element={<UseTemplate />} />
             <Route path="responses/:id" element={<ViewResponses />} />
           </Route>
-          <Route path="support-tickets" element={<SupportTickets />} />
+          <Route path="support-tickets" element={
+            <div className="container mx-auto px-4 py-8">
+              <CreateTicket />
+              <div className="mt-8">
+                <TicketList />
+              </div>
+            </div>
+          } />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>

@@ -42,7 +42,21 @@ export const getUserTickets = async (email, startAt = 0) => {
         startAt
       }
     });
-    return response.data;
+
+    // Преобразуем данные в нужный формат
+    return {
+      total: response.data.total,
+      tickets: response.data.tickets.map(ticket => ({
+        id: ticket.id,
+        key: ticket.key,
+        summary: ticket.summary,
+        description: ticket.description,
+        priority: ticket.priority,
+        status: ticket.status,
+        created: new Date(ticket.created).toLocaleString(),
+        updated: new Date(ticket.updated).toLocaleString()
+      }))
+    };
   } catch (error) {
     console.error('Error fetching tickets:', error);
     throw new Error('Failed to fetch tickets');
