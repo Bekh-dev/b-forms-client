@@ -1,24 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { loadUser, selectIsAuthenticated } from '../../store/slices/authSlice';
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import Header from '../Header/Header';
 import CreateTicket from '../JiraTicket/CreateTicket';
 
 const Layout = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
   const [showTicketModal, setShowTicketModal] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(loadUser()).unwrap()
-        .catch(() => {
-          navigate('/login');
-        });
-    }
-  }, [dispatch, isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-900 relative">
@@ -49,11 +35,9 @@ const Layout = () => {
         </svg>
       </button>
 
+      {/* Ticket Modal */}
       {showTicketModal && (
-        <CreateTicket
-          isOpen={showTicketModal}
-          onClose={() => setShowTicketModal(false)}
-        />
+        <CreateTicket open={showTicketModal} setOpen={setShowTicketModal} />
       )}
     </div>
   );

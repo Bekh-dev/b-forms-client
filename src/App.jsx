@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectIsAuthenticated } from './store/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUser, selectIsAuthenticated } from './store/slices/authSlice';
 import { Toaster } from 'react-hot-toast';
 
 // Components
@@ -18,25 +18,34 @@ import UseTemplate from './pages/Templates/UseTemplate';
 import ViewResponses from './pages/Templates/ViewResponses';
 import SupportTickets from './pages/Profile/SupportTickets';
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
-
-const PublicRoute = ({ children }) => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  return !isAuthenticated ? children : <Navigate to="/dashboard" />;
-};
-
 const App = () => {
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(loadUser());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
       <Toaster position="top-right" />
       <Routes>
-        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-        <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-          <Route index element={<Navigate to="/dashboard" />} />
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/register"
+          element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/"
+          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
+        >
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="settings" element={<Settings />} />
           <Route path="templates">
@@ -48,6 +57,7 @@ const App = () => {
             <Route path="responses/:id" element={<ViewResponses />} />
           </Route>
           <Route path="support-tickets" element={<SupportTickets />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
     </Router>
