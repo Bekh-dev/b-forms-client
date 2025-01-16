@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUser, selectIsAuthenticated } from './store/slices/authSlice';
 import { Toaster } from 'react-hot-toast';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Components
 import Layout from './components/Layout/Layout';
@@ -32,44 +34,47 @@ const App = () => {
   }, [dispatch]);
 
   return (
-    <Router basename="/b-forms-client">
-      <Toaster position="top-right" />
-      <Routes>
-        <Route
-          path="/login"
-          element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />}
-        />
-        <Route
-          path="/register"
-          element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />}
-        />
-        <Route
-          path="/"
-          element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
-        >
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="templates">
-            <Route index element={<MyTemplates />} />
-            <Route path="public" element={<PublicTemplates />} />
-            <Route path="create" element={<CreateTemplate />} />
-            <Route path="edit/:id" element={<EditTemplate />} />
-            <Route path="use/:id" element={<UseTemplate />} />
-            <Route path="responses/:id" element={<ViewResponses />} />
-          </Route>
-          <Route path="support-tickets" element={
-            <div className="container mx-auto px-4 py-8">
-              <CreateTicket />
-              <div className="mt-8">
-                <TicketList />
+    <>
+      <Router basename="/b-forms-client">
+        <Toaster position="top-right" />
+        <Routes>
+          <Route
+            path="/login"
+            element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />}
+          />
+          <Route
+            path="/register"
+            element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />}
+          />
+          <Route
+            path="/"
+            element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="templates">
+              <Route index element={<MyTemplates />} />
+              <Route path="public" element={<PublicTemplates />} />
+              <Route path="create" element={<CreateTemplate />} />
+              <Route path="edit/:id" element={<EditTemplate />} />
+              <Route path="use/:id" element={<UseTemplate />} />
+              <Route path="responses/:id" element={<ViewResponses />} />
+            </Route>
+            <Route path="support-tickets" element={
+              <div className="container mx-auto px-4 py-8">
+                <CreateTicket />
+                <div className="mt-8">
+                  <TicketList />
+                </div>
               </div>
-            </div>
-          } />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Route>
-      </Routes>
-    </Router>
+            } />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Route>
+        </Routes>
+      </Router>
+      <ToastContainer />
+    </>
   );
 };
 
