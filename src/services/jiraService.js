@@ -3,11 +3,13 @@ import api from '../api/axios';
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
     const data = {
-      summary,
-      description,
-      priority,
-      reporter,
-      pageUrl
+      fields: {
+        summary,
+        description: `${description}\n\nPage URL: ${pageUrl}\nReporter: ${reporter}`,
+        issuetype: {
+          name: "Task"
+        }
+      }
     };
 
     console.log('Creating ticket with data:', data);
@@ -22,6 +24,13 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     
     if (error.response?.data?.errorMessages?.length > 0) {
       throw new Error(error.response.data.errorMessages[0]);
+    }
+    
+    if (error.response?.data?.errors) {
+      const errorMessages = Object.entries(error.response.data.errors)
+        .map(([field, message]) => `${field}: ${message}`)
+        .join(', ');
+      throw new Error(`Validation errors: ${errorMessages}`);
     }
     
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
