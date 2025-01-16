@@ -11,7 +11,7 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
 
     console.log('Creating ticket with data:', data);
 
-    const response = await api.post('/jira/tickets', data);
+    const response = await api.post('/api/jira/tickets', data);
     return response.data;
   } catch (error) {
     console.error('Error creating Jira ticket:', {
@@ -36,7 +36,7 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
-    const response = await api.get(`/jira/tickets/${email}`, {
+    const response = await api.get(`/api/jira/tickets/${email}`, {
       params: {
         startAt
       }
