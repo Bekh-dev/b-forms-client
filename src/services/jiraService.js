@@ -2,6 +2,15 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 export const createJiraTicket = async ({ summary, description, reporter, pageUrl, priority = 'Medium' }) => {
   try {
     const data = {
@@ -14,34 +23,36 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
 
     console.log('Creating ticket with data:', data);
 
-    const response = await axios.post(`${API_URL}/jira/tickets`, data, {
-      withCredentials: true,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await api.post('/jira/tickets', data);
+    console.log('Ticket created:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error creating Jira ticket:', error.response?.data || error.message);
+    console.error('Error creating Jira ticket:', {
+      message: error.message,
+      response: error.response?.data
+    });
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
 };
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
-    console.log('Fetching tickets for email:', email);
-    const response = await axios.get(`${API_URL}/jira/tickets/${encodeURIComponent(email)}`, {
+    console.log('Fetching tickets for email:', email, 'from URL:', `${API_URL}/jira/tickets/${encodeURIComponent(email)}`);
+    const response = await api.get(`/jira/tickets/${encodeURIComponent(email)}`, {
       params: {
         startAt
-      },
-      withCredentials: true
+      }
     });
-    console.log('API Response:', response.data);
-
+    console.log('Tickets response:', response.data);
+    
+    if (!response.data) {
+      throw new Error('No data received from server');
+    }
+    
     // Преобразуем данные в нужный формат
     return {
-      total: response.data.total,
-      tickets: response.data.tickets.map(ticket => ({
+      total: response.data.total || 0,
+      tickets: response.data.tickets || response.data.tickets.map(ticket => ({
         id: ticket.id,
         key: ticket.key,
         summary: ticket.summary,
@@ -53,7 +64,16 @@ export const getUserTickets = async (email, startAt = 0) => {
       }))
     };
   } catch (error) {
-    console.error('Error fetching tickets:', error.response?.data || error.message);
+    console.error('Error fetching tickets:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    
+    if (error.response?.status === 404) {
+      throw new Error('Server endpoint not found. Please check server configuration.');
+    }
+    
     throw new Error(error.response?.data?.message || error.message || 'Failed to fetch tickets');
   }
 };
