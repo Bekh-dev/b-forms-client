@@ -8,6 +8,9 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
         description: `${description}\n\nPage URL: ${pageUrl}\nReporter: ${reporter}`,
         issuetype: {
           name: "Bug"
+        },
+        project: {
+          key: "KAN"
         }
       }
     };
