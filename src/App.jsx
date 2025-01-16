@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from './store/slices/authSlice';
-import Layout from './components/layout/Layout';
+import Layout from './components/Layout/Layout';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Dashboard from './pages/Dashboard/Dashboard';

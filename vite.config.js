@@ -6,9 +6,24 @@ export default defineConfig({
   base: '/b-forms-client/',
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@headlessui/react', '@heroicons/react'],
+          state: ['@reduxjs/toolkit', 'react-redux'],
+        },
+      },
+    },
   },
-  server: {
-    port: 3000
-  }
+  resolve: {
+    alias: {
+      '@': '/src',
+      '@components': '/src/components',
+      '@pages': '/src/pages',
+      '@store': '/src/store',
+      '@utils': '/src/utils',
+    },
+  },
 });
