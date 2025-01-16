@@ -5,12 +5,17 @@ import { Toaster } from 'react-hot-toast';
 
 import Layout from './components/Layout/Layout';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+
+// Pages
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
-import FormBuilder from './pages/FormBuilder/FormBuilder';
+import Forms from './pages/Forms/Forms';
 import Profile from './pages/Profile/Profile';
 import Templates from './pages/Templates/Templates';
+import Settings from './pages/Settings/Settings';
+
+// Store
 import { loadUser } from './store/slices/authSlice';
 
 import './App.css';
@@ -34,9 +39,10 @@ function App() {
         <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="form-builder" element={<FormBuilder />} />
-          <Route path="templates" element={<Templates />} />
+          <Route path="forms/*" element={<Forms />} />
+          <Route path="templates/*" element={<Templates />} />
           <Route path="profile/*" element={<Profile />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </Router>
