@@ -7,27 +7,16 @@ export default defineConfig({
   base: '/b-forms-client/',
   build: {
     outDir: 'dist',
-    sourcemap: false,
-    minify: 'terser',
-    assetsDir: 'assets',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      }
-    },
+    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@heroicons/react'],
-          state: ['@reduxjs/toolkit', 'react-redux']
+          ui: ['@headlessui/react', '@heroicons/react'],
+          state: ['@reduxjs/toolkit', 'react-redux'],
         },
-        assetFileNames: 'assets/[name].[ext]',
-        chunkFileNames: 'assets/[name].js',
-        entryFileNames: 'assets/[name].js',
       },
-    }
+    },
   },
   server: {
     port: 3000,
