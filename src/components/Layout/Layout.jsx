@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUser, selectIsAuthenticated } from '../../store/slices/authSlice';
-import Header from '../header/Header';
+import Header from '../Header/Header';
 import CreateTicket from '../JiraTicket/CreateTicket';
 
 const Layout = () => {
@@ -49,9 +49,9 @@ const Layout = () => {
         </svg>
       </button>
 
-      {/* Ticket Modal */}
       {showTicketModal && (
         <CreateTicket
+          isOpen={showTicketModal}
           onClose={() => setShowTicketModal(false)}
         />
       )}

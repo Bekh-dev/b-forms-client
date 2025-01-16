@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectIsAuthenticated } from './store/slices/authSlice';
+import { fetchUserData } from './store/slices/authSlice';
+import { Toaster } from 'react-hot-toast';
+
 import Layout from './components/Layout/Layout';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
@@ -26,8 +29,18 @@ const PublicRoute = ({ children }) => {
 };
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      dispatch(fetchUserData());
+    }
+  }, [dispatch]);
+
   return (
     <Router>
+      <Toaster position="top-right" />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={
