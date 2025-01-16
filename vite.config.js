@@ -1,25 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: './',
+  base: '/b-forms-client/',
   build: {
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: undefined,
-        assetFileNames: 'assets/[name].[ext]',
-        chunkFileNames: 'assets/[name].js',
-        entryFileNames: 'assets/[name].js',
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@headlessui/react', '@heroicons/react'],
+          state: ['@reduxjs/toolkit', 'react-redux'],
+        },
       },
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
     },
   },
 });
