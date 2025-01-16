@@ -13,6 +13,7 @@ import CreateTemplate from './pages/Templates/CreateTemplate';
 import EditTemplate from './pages/Templates/EditTemplate';
 import UseTemplate from './pages/Templates/UseTemplate';
 import ViewResponses from './pages/Templates/ViewResponses';
+import SupportTickets from './pages/Profile/SupportTickets';
 
 const PrivateRoute = ({ children }) => {
   const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -49,15 +50,18 @@ const App = () => {
             </PrivateRoute>
           }
         >
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/dashboard" />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="templates/my" element={<MyTemplates />} />
-          <Route path="templates/public" element={<PublicTemplates />} />
-          <Route path="templates/create" element={<CreateTemplate />} />
-          <Route path="templates/edit/:id" element={<EditTemplate />} />
-          <Route path="templates/use/:id" element={<UseTemplate />} />
-          <Route path="templates/responses/:id" element={<ViewResponses />} />
+          <Route path="templates">
+            <Route index element={<MyTemplates />} />
+            <Route path="public" element={<PublicTemplates />} />
+            <Route path="create" element={<CreateTemplate />} />
+            <Route path="edit/:id" element={<EditTemplate />} />
+            <Route path="use/:id" element={<UseTemplate />} />
+            <Route path="responses/:id" element={<ViewResponses />} />
+          </Route>
+          <Route path="support-tickets" element={<SupportTickets />} />
         </Route>
       </Routes>
     </Router>
