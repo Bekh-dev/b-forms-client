@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://b-froms-server.onrender.com',
+  baseURL: 'https://b-froms-server.onrender.com/api',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -19,9 +19,7 @@ api.interceptors.request.use(
     console.log('Request:', {
       url: config.url,
       method: config.method,
-      data: config.data,
-      headers: config.headers,
-      baseURL: config.baseURL
+      data: config.data
     });
     
     return config;
@@ -38,18 +36,15 @@ api.interceptors.response.use(
     // Log successful response
     console.log('Response:', {
       status: response.status,
-      data: response.data,
-      headers: response.headers
+      data: response.data
     });
     return response;
   },
   (error) => {
     // Log error response
     console.error('Response error:', {
-      status: error.response?.status,
-      data: error.response?.data,
       message: error.message,
-      config: error.config
+      response: error.response?.data
     });
     
     if (error.response?.status === 401) {
