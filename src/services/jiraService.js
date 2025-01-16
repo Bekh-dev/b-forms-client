@@ -2,12 +2,17 @@ import api from '../api/axios';
 
 const jiraApi = api;
 
-export const createJiraTicket = async ({ summary, priority, description, reporter, templateTitle, pageUrl }) => {
+export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
+    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY;
+    if (!projectKey) {
+      throw new Error('Project key is not configured');
+    }
+
     const data = {
       fields: {
         project: {
-          key: import.meta.env.VITE_JIRA_PROJECT_KEY
+          key: projectKey
         },
         summary,
         description: {
@@ -27,7 +32,7 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
               type: "paragraph",
               content: [
                 {
-                  text: `Template: ${templateTitle || 'N/A'}`,
+                  text: `Page URL: ${pageUrl}`,
                   type: "text"
                 }
               ]
@@ -36,7 +41,7 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
               type: "paragraph",
               content: [
                 {
-                  text: `Page URL: ${pageUrl}`,
+                  text: `Reporter: ${reporter}`,
                   type: "text"
                 }
               ]
@@ -58,25 +63,25 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     const response = await jiraApi.post('/api/jira/tickets', data);
     return response.data;
   } catch (error) {
-    console.error('Error creating Jira ticket:', error);
-    throw error.response?.data || { message: 'Failed to create ticket' };
+    console.error('Error creating Jira ticket:', error.response?.data || error.message);
+    if (error.response?.data?.errors?.project) {
+      throw new Error('Invalid project configuration. Please check your settings.');
+    }
+    throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
 };
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
-    const jql = `reporter = "${email}" ORDER BY created DESC`;
-    const response = await jiraApi.get(`/api/jira/tickets/${email}`, {
+    const response = await jiraApi.get('/api/jira/tickets', {
       params: {
-        jql,
-        startAt,
-        maxResults: 10
+        email,
+        startAt
       }
     });
-
     return response.data;
   } catch (error) {
-    console.error('Error fetching user tickets:', error);
-    throw error.response?.data || { message: 'Failed to fetch tickets' };
+    console.error('Error fetching tickets:', error);
+    throw new Error('Failed to fetch tickets');
   }
 };
