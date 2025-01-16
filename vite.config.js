@@ -7,14 +7,5 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['@headlessui/react', '@heroicons/react'],
-          state: ['@reduxjs/toolkit', 'react-redux'],
-        },
-      },
-    },
   },
 });
