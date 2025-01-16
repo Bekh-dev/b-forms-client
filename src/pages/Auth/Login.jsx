@@ -20,6 +20,7 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
+      console.log('Login data being sent:', data);
       await dispatch(login(data)).unwrap();
       navigate('/dashboard');
     } catch (error) {
@@ -61,7 +62,7 @@ const Login = () => {
                   Forgot password?
                 </Link>
               </div>
-              
+　　 　 　 　
               <FormInput
                 error={errors.password?.message}
                 register={register('password', VALIDATION_RULES.password)}
