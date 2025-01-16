@@ -4,7 +4,7 @@ export const config = {
   jira: {
     domain: 'https://isbek2000.atlassian.net',
     email: 'isbek2000@gmail.com',
-    apiToken: 'ATATT3xFfGF0TuDUKT5TMlzHJ0r1rgMV_paALKjvkypg7uqCRmSJhkfiP4zB6hXPWMxWqJnA3ZHaMl0bNkwuAq0Eg7PSlXnwglRAiWnxS1EbosEuJKbikEMGBklWBhtix8COV3rs5ksN9_7UTVbU5b0FmLPZT2yDjLWg3s5CBzcZLynlRPQL150=2A5DA432',
+    apiToken: 'ATATT3xFfGF0xzrccU7WKZtsvbzYHmVdNvmElELfoiJDpCX30ppPPHZhv9wXr7o9-UkMiwvpYI4doIjwbTaiv0yWaJrP3rdpd4rdg-O6wdV_Ip07RMqzS1pOL5mOVn-Z3BVyTZ_SV7KiYjKYBX80r9cHZdwzttn1VCAkAbtuKfhmbQrY3soKUTo=DA97581D',
     projectKey: 'KAN'
   }
 };
