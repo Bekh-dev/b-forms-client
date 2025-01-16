@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json'
   }
@@ -17,6 +17,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -25,20 +26,12 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response) {
-      // Если сервер вернул ошибку
-      if (error.response.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }
-      throw error.response.data;
-    } else if (error.request) {
-      // Если не получили ответ
-      throw { message: 'Server is not responding' };
-    } else {
-      // Что-то случилось при настройке запроса
-      throw { message: 'Request failed' };
+    if (error.response?.status === 401) {
+      // Unauthorized - clear token and redirect to login
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
+    return Promise.reject(error);
   }
 );
 

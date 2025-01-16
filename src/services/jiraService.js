@@ -1,20 +1,10 @@
-import axios from 'axios';
+import api from '../api/axios';
 
-const jiraApi = axios.create({
-  baseURL: import.meta.env.VITE_JIRA_DOMAIN + '/rest/api/3',
-  auth: {
-    username: import.meta.env.VITE_JIRA_EMAIL,
-    password: import.meta.env.VITE_JIRA_API_TOKEN
-  },
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-});
+const jiraApi = api;
 
 export const createJiraTicket = async ({ summary, priority, description, reporter, templateTitle, pageUrl }) => {
   try {
-    const response = await jiraApi.post('/issue', {
+    const data = {
       fields: {
         project: {
           key: import.meta.env.VITE_JIRA_PROJECT_KEY
@@ -63,19 +53,20 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
           emailAddress: reporter
         }
       }
-    });
+    };
 
+    const response = await jiraApi.post('/api/jira/tickets', data);
     return response.data;
   } catch (error) {
     console.error('Error creating Jira ticket:', error);
-    throw error;
+    throw error.response?.data || { message: 'Failed to create ticket' };
   }
 };
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
     const jql = `reporter = "${email}" ORDER BY created DESC`;
-    const response = await jiraApi.get('/search', {
+    const response = await jiraApi.get(`/api/jira/tickets/${email}`, {
       params: {
         jql,
         startAt,
@@ -86,6 +77,6 @@ export const getUserTickets = async (email, startAt = 0) => {
     return response.data;
   } catch (error) {
     console.error('Error fetching user tickets:', error);
-    throw error;
+    throw error.response?.data || { message: 'Failed to fetch tickets' };
   }
 };
