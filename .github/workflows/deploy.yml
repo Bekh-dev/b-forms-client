@@ -24,17 +24,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create env.js
-        run: |
-          cat > public/env.js << EOL
-          window.ENV = {
-            VITE_JIRA_API_TOKEN: '${{ secrets.VITE_JIRA_API_TOKEN }}',
-            VITE_JIRA_EMAIL: '${{ secrets.VITE_JIRA_EMAIL }}',
-            VITE_JIRA_DOMAIN: '${{ secrets.VITE_JIRA_DOMAIN }}',
-            VITE_JIRA_PROJECT_KEY: '${{ secrets.VITE_JIRA_PROJECT_KEY }}',
-          };
-          EOL
-
       - name: Build
         run: npm run build
 

@@ -1,5 +1,5 @@
 import api from '../api/axios';
-import { config } from '../config';
+import { getConfig } from '../config';
 
 const jiraApi = api;
 
@@ -13,6 +13,7 @@ console.log('Environment variables:', {
 
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
+    const config = await getConfig();
     const projectKey = config.jira.projectKey;
     
     console.log('Jira Config:', {

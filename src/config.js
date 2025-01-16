@@ -1,17 +1,31 @@
-const getEnvVar = (key) => {
-  if (window.ENV && window.ENV[key]) {
-    return window.ENV[key];
-  }
-  return import.meta.env[key];
-};
+import api from './api/axios';
 
-export const config = {
-  apiUrl: getEnvVar('VITE_API_URL'),
+const defaultConfig = {
+  apiUrl: 'https://b-froms-server.onrender.com',
   appName: 'B-Forms',
   jira: {
-    domain: getEnvVar('VITE_JIRA_DOMAIN'),
-    email: getEnvVar('VITE_JIRA_EMAIL'),
-    projectKey: getEnvVar('VITE_JIRA_PROJECT_KEY'),
-    apiToken: getEnvVar('VITE_JIRA_API_TOKEN')
+    domain: '',
+    email: '',
+    projectKey: '',
+    apiToken: ''
   }
 };
+
+let configPromise = null;
+
+export const getConfig = async () => {
+  if (!configPromise) {
+    configPromise = api.get('/api/config')
+      .then(response => {
+        Object.assign(defaultConfig.jira, response.data.jira);
+        return defaultConfig;
+      })
+      .catch(error => {
+        console.error('Failed to load config:', error);
+        return defaultConfig;
+      });
+  }
+  return configPromise;
+};
+
+export const config = defaultConfig;
