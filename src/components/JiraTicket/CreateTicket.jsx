@@ -9,8 +9,7 @@ const CreateTicket = ({ open, setOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     summary: '',
-    description: '',
-    priority: 'Medium'
+    description: ''
   });
 
   const handleSubmit = async (e) => {
@@ -74,22 +73,6 @@ const CreateTicket = ({ open, setOpen }) => {
               className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white h-24 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Detailed description of the issue"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-300">
-              Priority
-            </label>
-            <select
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              className="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
