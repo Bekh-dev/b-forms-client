@@ -37,7 +37,7 @@ const Header = () => {
               Dashboard
             </Link>
             <Link
-              to="/templates/my"
+              to="/templates"
               className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium"
             >
               My Templates
