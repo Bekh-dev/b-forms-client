@@ -1,4 +1,5 @@
 import api from '../api/axios';
+import { config } from '../config';
 
 const jiraApi = api;
 
@@ -12,7 +13,7 @@ console.log('Environment variables:', {
 
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
-    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY;
+    const projectKey = config.jira.projectKey;
     
     if (!projectKey) {
       throw new Error(`Project key is not configured. Current value: ${projectKey}`);
@@ -72,7 +73,7 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     };
 
     console.log('Sending ticket data:', JSON.stringify(data, null, 2));
-
+    console.log('Creating ticket with data:', data);
     const response = await jiraApi.post('/api/jira/tickets', data);
     console.log('Jira response:', response.data);
     return response.data;
@@ -80,7 +81,7 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     console.error('Error creating Jira ticket:', {
       message: error.message,
       response: error.response?.data,
-      projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY
+      projectKey: config.jira.projectKey
     });
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
