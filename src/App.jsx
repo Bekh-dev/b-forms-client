@@ -1,40 +1,27 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectIsAuthenticated } from './store/slices/authSlice';
-import { fetchUserData } from './store/slices/authSlice';
 import { Toaster } from 'react-hot-toast';
 
 import Layout from './components/Layout/Layout';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
-import Settings from './pages/Settings/Settings';
-import MyTemplates from './pages/Templates/MyTemplates';
-import PublicTemplates from './pages/Templates/PublicTemplates';
-import CreateTemplate from './pages/Templates/CreateTemplate';
-import EditTemplate from './pages/Templates/EditTemplate';
-import UseTemplate from './pages/Templates/UseTemplate';
-import ViewResponses from './pages/Templates/ViewResponses';
-import SupportTickets from './pages/Profile/SupportTickets';
+import FormBuilder from './pages/FormBuilder/FormBuilder';
+import Profile from './pages/Profile/Profile';
+import Templates from './pages/Templates/Templates';
+import { loadUser } from './store/slices/authSlice';
 
-const PrivateRoute = ({ children }) => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
+import './App.css';
 
-const PublicRoute = ({ children }) => {
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  return !isAuthenticated ? children : <Navigate to="/dashboard" />;
-};
-
-const App = () => {
+function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      dispatch(fetchUserData());
+      dispatch(loadUser());
     }
   }, [dispatch]);
 
@@ -42,43 +29,18 @@ const App = () => {
     <Router>
       <Toaster position="top-right" />
       <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } />
-        <Route path="/register" element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        } />
-
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Navigate to="/dashboard" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="templates">
-            <Route index element={<MyTemplates />} />
-            <Route path="public" element={<PublicTemplates />} />
-            <Route path="create" element={<CreateTemplate />} />
-            <Route path="edit/:id" element={<EditTemplate />} />
-            <Route path="use/:id" element={<UseTemplate />} />
-            <Route path="responses/:id" element={<ViewResponses />} />
-          </Route>
-          <Route path="support-tickets" element={<SupportTickets />} />
+          <Route path="form-builder" element={<FormBuilder />} />
+          <Route path="templates" element={<Templates />} />
+          <Route path="profile/*" element={<Profile />} />
         </Route>
       </Routes>
     </Router>
   );
-};
+}
 
 export default App;
