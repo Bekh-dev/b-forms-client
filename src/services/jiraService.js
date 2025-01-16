@@ -1,12 +1,13 @@
 import api from '../api/axios';
 
-export const createJiraTicket = async ({ summary, description, reporter, pageUrl }) => {
+export const createJiraTicket = async ({ summary, description, reporter, pageUrl, priority = 'Medium' }) => {
   try {
     const data = {
       summary,
       description,
       reporter,
-      pageUrl
+      pageUrl,
+      priority
     };
 
     console.log('Creating ticket with data:', data);
