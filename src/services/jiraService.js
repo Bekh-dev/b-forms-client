@@ -1,117 +1,23 @@
 import api from '../api/axios';
-import { getConfig } from '../config';
-
-const jiraApi = api;
-
-// Log all environment variables at startup
-console.log('Environment variables:', {
-  API_URL: import.meta.env.VITE_API_URL,
-  JIRA_DOMAIN: import.meta.env.VITE_JIRA_DOMAIN,
-  JIRA_PROJECT_KEY: import.meta.env.VITE_JIRA_PROJECT_KEY,
-  // Don't log sensitive information like API tokens
-});
 
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
-    const config = await getConfig();
-    const projectKey = config.jira.projectKey;
-    
-    console.log('Jira Config:', {
-      domain: config.jira.domain,
-      email: config.jira.email,
-      projectKey: config.jira.projectKey,
-      hasToken: !!config.jira.apiToken,
-      envVars: {
-        domain: import.meta.env.VITE_JIRA_DOMAIN,
-        email: import.meta.env.VITE_JIRA_EMAIL,
-        projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
-        hasToken: !!import.meta.env.VITE_JIRA_API_TOKEN
-      }
-    });
-
-    if (!projectKey) {
-      throw new Error(`Project key is not configured. Current value: ${projectKey}`);
-    }
-
-    if (!config.jira.apiToken) {
-      throw new Error('Jira API token is not configured');
-    }
-
     const data = {
-      fields: {
-        project: {
-          key: projectKey
-        },
-        summary,
-        description: {
-          type: "doc",
-          version: 1,
-          content: [
-            {
-              type: "paragraph",
-              content: [
-                {
-                  text: description,
-                  type: "text"
-                }
-              ]
-            },
-            {
-              type: "paragraph",
-              content: [
-                {
-                  text: `Page URL: ${pageUrl}`,
-                  type: "text"
-                }
-              ]
-            },
-            {
-              type: "paragraph",
-              content: [
-                {
-                  text: `Reporter: ${reporter}`,
-                  type: "text"
-                }
-              ]
-            }
-          ]
-        },
-        issuetype: {
-          name: "Task"
-        },
-        priority: {
-          name: priority
-        }
-      },
-      auth: {
-        email: config.jira.email,
-        apiToken: config.jira.apiToken
-      }
+      summary,
+      description,
+      priority,
+      reporter,
+      pageUrl
     };
 
-    console.log('Creating ticket with data:', {
-      ...data,
-      auth: {
-        email: config.jira.email,
-        apiToken: '***' // Hide token in logs
-      }
-    });
+    console.log('Creating ticket with data:', data);
 
-    const response = await jiraApi.post('/api/jira/tickets', data);
-    console.log('Jira response:', response.data);
+    const response = await api.post('/api/jira/tickets', data);
     return response.data;
   } catch (error) {
     console.error('Error creating Jira ticket:', {
       message: error.message,
-      response: error.response?.data,
-      projectKey: config.jira.projectKey,
-      hasToken: !!config.jira.apiToken,
-      envVars: {
-        domain: import.meta.env.VITE_JIRA_DOMAIN,
-        email: import.meta.env.VITE_JIRA_EMAIL,
-        projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
-        hasToken: !!import.meta.env.VITE_JIRA_API_TOKEN
-      }
+      response: error.response?.data
     });
     
     if (error.response?.data?.errorMessages?.length > 0) {
@@ -124,13 +30,12 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
 
 export const getUserTickets = async (email, startAt = 0) => {
   try {
-    const response = await jiraApi.get('/api/jira/tickets', {
+    const response = await api.get('/api/jira/tickets', {
       params: {
         email,
         startAt
       }
     });
-    console.log('Jira response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching tickets:', error);
