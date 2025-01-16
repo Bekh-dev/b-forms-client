@@ -4,10 +4,10 @@ const defaultConfig = {
   apiUrl: 'https://b-froms-server.onrender.com',
   appName: 'B-Forms',
   jira: {
-    domain: '',
-    email: '',
-    projectKey: '',
-    apiToken: ''
+    domain: process.env.VITE_JIRA_DOMAIN,
+    email: process.env.VITE_JIRA_EMAIL,
+    projectKey: process.env.VITE_JIRA_PROJECT_KEY,
+    apiToken: process.env.VITE_JIRA_API_TOKEN
   }
 };
 
