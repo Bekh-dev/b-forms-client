@@ -65,15 +65,15 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
         },
         priority: {
           name: priority
-        },
-        reporter: {
-          emailAddress: reporter
         }
+      },
+      auth: {
+        email: config.jira.email,
+        apiToken: config.jira.apiToken
       }
     };
 
-    console.log('Sending ticket data:', JSON.stringify(data, null, 2));
-    console.log('Creating ticket with data:', data);
+    console.log('Creating ticket with data:', JSON.stringify(data, null, 2));
     const response = await jiraApi.post('/api/jira/tickets', data);
     console.log('Jira response:', response.data);
     return response.data;
@@ -83,6 +83,11 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
       response: error.response?.data,
       projectKey: config.jira.projectKey
     });
+    
+    if (error.response?.data?.errorMessages?.length > 0) {
+      throw new Error(error.response.data.errorMessages[0]);
+    }
+    
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
 };
