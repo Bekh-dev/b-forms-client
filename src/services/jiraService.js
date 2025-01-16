@@ -9,10 +9,13 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
       throw new Error('Project key is not configured');
     }
 
+    console.log('Creating ticket with project key:', projectKey);
+
     const data = {
       fields: {
         project: {
-          key: projectKey
+          key: projectKey,
+          id: "10000" 
         },
         summary,
         description: {
@@ -49,9 +52,11 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
           ]
         },
         issuetype: {
+          id: "10001", 
           name: "Task"
         },
         priority: {
+          id: priority === 'High' ? '1' : priority === 'Medium' ? '3' : '5', 
           name: priority
         },
         reporter: {
@@ -60,12 +65,17 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
       }
     };
 
+    console.log('Sending ticket data:', JSON.stringify(data, null, 2));
+
     const response = await jiraApi.post('/api/jira/tickets', data);
+    console.log('Jira response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error creating Jira ticket:', error.response?.data || error.message);
+    console.error('Full error object:', error);
+    
     if (error.response?.data?.errors?.project) {
-      throw new Error('Invalid project configuration. Please check your settings.');
+      throw new Error(`Project configuration error: ${error.response.data.errors.project}`);
     }
     throw new Error(error.response?.data?.message || error.message || 'Failed to create ticket');
   }
