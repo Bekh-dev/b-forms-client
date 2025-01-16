@@ -4,7 +4,7 @@ const jiraApi = api;
 
 export const createJiraTicket = async ({ summary, priority, description, reporter, pageUrl }) => {
   try {
-    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY;
+    const projectKey = import.meta.env.VITE_JIRA_PROJECT_KEY?.replace(/['"]/g, '');
     if (!projectKey) {
       throw new Error('Project key is not configured');
     }
@@ -14,8 +14,7 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     const data = {
       fields: {
         project: {
-          key: projectKey,
-          id: "10000" 
+          key: projectKey
         },
         summary,
         description: {
@@ -52,11 +51,9 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
           ]
         },
         issuetype: {
-          id: "10001", 
           name: "Task"
         },
         priority: {
-          id: priority === 'High' ? '1' : priority === 'Medium' ? '3' : '5', 
           name: priority
         },
         reporter: {
