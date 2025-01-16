@@ -1,10 +1,17 @@
+const getEnvVar = (key) => {
+  if (window.ENV && window.ENV[key]) {
+    return window.ENV[key];
+  }
+  return import.meta.env[key];
+};
+
 export const config = {
-  apiUrl: import.meta.env.VITE_API_URL,
+  apiUrl: getEnvVar('VITE_API_URL'),
   appName: 'B-Forms',
   jira: {
-    domain: import.meta.env.VITE_JIRA_DOMAIN,
-    email: import.meta.env.VITE_JIRA_EMAIL,
-    projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
-    apiToken: import.meta.env.VITE_JIRA_API_TOKEN
+    domain: getEnvVar('VITE_JIRA_DOMAIN'),
+    email: getEnvVar('VITE_JIRA_EMAIL'),
+    projectKey: getEnvVar('VITE_JIRA_PROJECT_KEY'),
+    apiToken: getEnvVar('VITE_JIRA_API_TOKEN')
   }
 };
