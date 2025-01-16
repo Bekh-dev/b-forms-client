@@ -1,9 +1,10 @@
 export const config = {
-  apiUrl: 'https://b-froms-server.onrender.com',
+  apiUrl: import.meta.env.VITE_API_URL,
   appName: 'B-Forms',
   jira: {
-    domain: 'https://isbek2000.atlassian.net',
-    email: 'isbek2000@gmail.com',
-    projectKey: 'KAN'
+    domain: import.meta.env.VITE_JIRA_DOMAIN,
+    email: import.meta.env.VITE_JIRA_EMAIL,
+    projectKey: import.meta.env.VITE_JIRA_PROJECT_KEY,
+    apiToken: import.meta.env.VITE_JIRA_API_TOKEN
   }
 };

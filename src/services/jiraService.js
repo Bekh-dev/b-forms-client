@@ -19,7 +19,9 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
       throw new Error(`Project key is not configured. Current value: ${projectKey}`);
     }
 
-    console.log('Creating ticket with project key:', projectKey);
+    if (!config.jira.apiToken) {
+      throw new Error('Jira API token is not configured');
+    }
 
     const data = {
       fields: {
@@ -66,10 +68,21 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
         priority: {
           name: priority
         }
+      },
+      auth: {
+        email: config.jira.email,
+        apiToken: config.jira.apiToken
       }
     };
 
-    console.log('Creating ticket with data:', JSON.stringify(data, null, 2));
+    console.log('Creating ticket with data:', {
+      ...data,
+      auth: {
+        email: config.jira.email,
+        apiToken: '***' // Hide token in logs
+      }
+    });
+
     const response = await jiraApi.post('/api/jira/tickets', data);
     console.log('Jira response:', response.data);
     return response.data;
@@ -77,7 +90,8 @@ export const createJiraTicket = async ({ summary, priority, description, reporte
     console.error('Error creating Jira ticket:', {
       message: error.message,
       response: error.response?.data,
-      projectKey: config.jira.projectKey
+      projectKey: config.jira.projectKey,
+      hasToken: !!config.jira.apiToken
     });
     
     if (error.response?.data?.errorMessages?.length > 0) {
