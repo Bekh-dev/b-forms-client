@@ -23,12 +23,17 @@ const getAuthConfig = () => {
   };
 };
 
-export const createJiraTicket = async ({ summary, description, reporter, pageUrl, priority = 'Medium' }) => {
+export const createJiraTicket = async ({ summary, description, pageUrl, priority = 'Medium' }) => {
   try {
+    const userEmail = localStorage.getItem('userEmail'); // Get user email
+    if (!userEmail) {
+      throw new Error('User email not found. Please log in again.');
+    }
+
     const data = {
       summary,
       description,
-      reporter,
+      reporter: userEmail, // Add reporter email
       pageUrl,
       priority
     };

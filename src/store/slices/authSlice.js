@@ -53,6 +53,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
+      localStorage.removeItem('userEmail');
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
@@ -95,6 +96,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.error = null;
         localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('userEmail', action.payload.user.email);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
