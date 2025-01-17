@@ -14,10 +14,11 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/register', userData);
+      const response = await api.post('/auth/register', userData);
+      localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Registration failed');
+      return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }
   }
 );
@@ -26,22 +27,26 @@ export const login = createAsyncThunk(
   'auth/login',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/login', userData);
+      const response = await api.post('/auth/login', userData);
+      localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Login failed');
+      return rejectWithValue(error.response?.data?.message || 'Login failed');
     }
   }
 );
 
 export const loadUser = createAsyncThunk(
   'auth/loadUser',
-  async (_, { rejectWithValue, getState }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/auth/user');
+      const response = await api.get('/auth/user');
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to load user');
+      if (error.response?.status === 401) {
+        localStorage.removeItem('token');
+      }
+      return rejectWithValue(error.response?.data?.message || 'Failed to load user');
     }
   }
 );
@@ -53,7 +58,6 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
-      localStorage.removeItem('userEmail');
       state.token = null;
       state.user = null;
       state.isAuthenticated = false;
@@ -73,16 +77,13 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
+        state.isAuthenticated = true;
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.isAuthenticated = true;
-        state.error = null;
-        localStorage.setItem('token', action.payload.token);
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        state.isAuthenticated = false;
       })
       // Login
       .addCase(login.pending, (state) => {
@@ -91,35 +92,28 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
+        state.isAuthenticated = true;
         state.token = action.payload.token;
         state.user = action.payload.user;
-        state.isAuthenticated = true;
-        state.error = null;
-        localStorage.setItem('token', action.payload.token);
-        localStorage.setItem('userEmail', action.payload.user.email);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        state.isAuthenticated = false;
       })
       // Load User
       .addCase(loadUser.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loadUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
-        state.isAuthenticated = true;
       })
       .addCase(loadUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        if (action.payload === 'Token is not valid') {
-          state.token = null;
-          state.user = null;
+        if (!state.token) {
           state.isAuthenticated = false;
-          localStorage.removeItem('token');
         }
       });
   }
