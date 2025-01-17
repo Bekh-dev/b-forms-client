@@ -69,6 +69,21 @@ export const fetchTemplateById = createAsyncThunk(
   }
 );
 
+export const deleteTemplate = createAsyncThunk(
+  'templates/deleteTemplate',
+  async (id, { rejectWithValue }) => {
+    try {
+      console.log('Deleting template:', id);
+      await api.delete(`/api/templates/${id}`);
+      console.log('Template deleted successfully');
+      return id;
+    } catch (error) {
+      console.error('Failed to delete template:', error.response?.data);
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete template');
+    }
+  }
+);
+
 const templateSlice = createSlice({
   name: 'templates',
   initialState,
@@ -142,6 +157,21 @@ const templateSlice = createSlice({
       .addCase(fetchTemplateById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to fetch template';
+      })
+
+    // Delete Template
+      .addCase(deleteTemplate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteTemplate.fulfilled, (state, action) => {
+        state.loading = false;
+        state.templates = state.templates.filter(template => template._id !== action.payload);
+        state.error = null;
+      })
+      .addCase(deleteTemplate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to delete template';
       });
   }
 });
