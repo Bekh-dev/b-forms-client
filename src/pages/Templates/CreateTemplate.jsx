@@ -112,7 +112,7 @@ const CreateTemplate = () => {
       title: formData.title,
       description: formData.description,
       isPublished: formData.isPublished,
-      fields: formData.questions.map(({ id, ...question }) => ({
+      questions: formData.questions.map(({ id, ...question }) => ({
         type: question.type,
         label: question.label,
         placeholder: question.placeholder || '',
