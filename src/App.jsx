@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUser, selectIsAuthenticated } from './store/slices/authSlice';
+import { loadUser, selectIsAuthenticated, selectAuthLoading } from './store/slices/authSlice';
 import { Toaster } from 'react-hot-toast';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,6 +25,7 @@ import TicketList from './components/JiraTicket/TicketList';
 const App = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const authLoading = useSelector(selectAuthLoading);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -32,6 +33,14 @@ const App = () => {
       dispatch(loadUser());
     }
   }, [dispatch]);
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -50,7 +59,7 @@ const App = () => {
             path="/"
             element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}
           >
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route index element={<MyTemplates />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="settings" element={<Settings />} />
             <Route path="templates">
@@ -69,7 +78,7 @@ const App = () => {
                 </div>
               </div>
             } />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </Router>

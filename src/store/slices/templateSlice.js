@@ -13,9 +13,12 @@ export const createTemplate = createAsyncThunk(
   'templates/createTemplate',
   async (templateData, { rejectWithValue }) => {
     try {
+      console.log('Creating template with data:', templateData);
       const response = await api.post('/api/templates', templateData);
+      console.log('Template created:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Failed to create template:', error.response?.data);
       return rejectWithValue(error.response?.data?.message || 'Failed to create template');
     }
   }
@@ -25,9 +28,12 @@ export const fetchMyTemplates = createAsyncThunk(
   'templates/fetchMyTemplates',
   async (_, { rejectWithValue }) => {
     try {
+      console.log('Fetching my templates');
       const response = await api.get('/api/templates/my');
+      console.log('My templates fetched:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Failed to fetch my templates:', error.response?.data);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch templates');
     }
   }
@@ -37,9 +43,12 @@ export const fetchPublicTemplates = createAsyncThunk(
   'templates/fetchPublicTemplates',
   async (_, { rejectWithValue }) => {
     try {
+      console.log('Fetching public templates');
       const response = await api.get('/api/templates/public');
+      console.log('Public templates fetched:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Failed to fetch public templates:', error.response?.data);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch public templates');
     }
   }
@@ -49,59 +58,13 @@ export const fetchTemplateById = createAsyncThunk(
   'templates/fetchTemplateById',
   async (id, { rejectWithValue }) => {
     try {
+      console.log('Fetching template by ID:', id);
       const response = await api.get(`/api/templates/${id}`);
+      console.log('Template fetched:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Failed to fetch template:', error.response?.data);
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch template');
-    }
-  }
-);
-
-export const updateTemplate = createAsyncThunk(
-  'templates/updateTemplate',
-  async ({ id, templateData }, { rejectWithValue }) => {
-    try {
-      const response = await api.put(`/api/templates/${id}`, templateData);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to update template');
-    }
-  }
-);
-
-export const deleteTemplate = createAsyncThunk(
-  'templates/deleteTemplate',
-  async (id, { rejectWithValue }) => {
-    try {
-      await api.delete(`/api/templates/${id}`);
-      return id;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to delete template');
-    }
-  }
-);
-
-// Добавляем новые действия для шаринга
-export const shareTemplate = createAsyncThunk(
-  'templates/shareTemplate',
-  async ({ templateId, email, accessType }, { rejectWithValue }) => {
-    try {
-      const response = await api.post(`/api/templates/${templateId}/share`, { email, accessType });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to share template');
-    }
-  }
-);
-
-export const generateShareableLink = createAsyncThunk(
-  'templates/generateShareableLink',
-  async (templateId, { rejectWithValue }) => {
-    try {
-      const response = await api.post(`/api/templates/${templateId}/shareable-link`);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to generate link');
     }
   }
 );
@@ -112,27 +75,31 @@ const templateSlice = createSlice({
   reducers: {
     clearCurrentTemplate(state) {
       state.currentTemplate = null;
+      state.error = null;
     },
     clearError(state) {
       state.error = null;
     }
   },
   extraReducers: (builder) => {
+    // Create Template
     builder
-      // Create template
       .addCase(createTemplate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createTemplate.fulfilled, (state, action) => {
         state.loading = false;
-        state.templates.push(action.payload);
+        state.templates = [...state.templates, action.payload];
+        state.currentTemplate = action.payload;
+        state.error = null;
       })
       .addCase(createTemplate.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || 'Failed to create template';
       })
-      // Fetch my templates
+
+    // Fetch My Templates
       .addCase(fetchMyTemplates.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -140,12 +107,14 @@ const templateSlice = createSlice({
       .addCase(fetchMyTemplates.fulfilled, (state, action) => {
         state.loading = false;
         state.templates = action.payload;
+        state.error = null;
       })
       .addCase(fetchMyTemplates.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || 'Failed to fetch templates';
       })
-      // Fetch public templates
+
+    // Fetch Public Templates
       .addCase(fetchPublicTemplates.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -153,12 +122,14 @@ const templateSlice = createSlice({
       .addCase(fetchPublicTemplates.fulfilled, (state, action) => {
         state.loading = false;
         state.publicTemplates = action.payload;
+        state.error = null;
       })
       .addCase(fetchPublicTemplates.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || 'Failed to fetch public templates';
       })
-      // Fetch template by id
+
+    // Fetch Template by ID
       .addCase(fetchTemplateById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -166,76 +137,22 @@ const templateSlice = createSlice({
       .addCase(fetchTemplateById.fulfilled, (state, action) => {
         state.loading = false;
         state.currentTemplate = action.payload;
+        state.error = null;
       })
       .addCase(fetchTemplateById.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-      })
-      // Update template
-      .addCase(updateTemplate.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateTemplate.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.templates.findIndex(t => t._id === action.payload._id);
-        if (index !== -1) {
-          state.templates[index] = action.payload;
-        }
-      })
-      .addCase(updateTemplate.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Delete template
-      .addCase(deleteTemplate.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteTemplate.fulfilled, (state, action) => {
-        state.loading = false;
-        state.templates = state.templates.filter(t => t._id !== action.payload);
-      })
-      .addCase(deleteTemplate.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Share template
-      .addCase(shareTemplate.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(shareTemplate.fulfilled, (state, action) => {
-        state.loading = false;
-        // Add logic to handle shared template
-      })
-      .addCase(shareTemplate.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Generate shareable link
-      .addCase(generateShareableLink.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(generateShareableLink.fulfilled, (state, action) => {
-        state.loading = false;
-        // Add logic to handle generated link
-      })
-      .addCase(generateShareableLink.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || 'Failed to fetch template';
       });
   }
 });
 
 export const { clearCurrentTemplate, clearError } = templateSlice.actions;
 
-export const selectMyTemplates = (state) => state.templates.templates;
-export const selectPublicTemplates = (state) => state.templates.publicTemplates;
-export const selectCurrentTemplate = (state) => state.templates.currentTemplate;
-export const selectTemplatesLoading = (state) => state.templates.loading;
-export const selectTemplatesError = (state) => state.templates.error;
-export const selectIsAuthenticated = (state) => !!state.auth?.token;
+export const selectMyTemplates = state => state.templates.templates;
+export const selectPublicTemplates = state => state.templates.publicTemplates;
+export const selectCurrentTemplate = state => state.templates.currentTemplate;
+export const selectTemplatesLoading = state => state.templates.loading;
+export const selectTemplatesError = state => state.templates.error;
+export const selectIsAuthenticated = state => state.auth.isAuthenticated;
 
 export default templateSlice.reducer;
