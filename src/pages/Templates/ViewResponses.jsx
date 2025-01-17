@@ -14,6 +14,7 @@ import {
   selectResponsesLoading,
   selectResponsesError
 } from '../../store/slices/responseSlice';
+import { exportToGoogleSheets } from '../../integrations/google-sheets';
 import ErrorBoundary from '../../components/ErrorBoundary';
 
 // Компонент для отображения статистики по одному вопросу
@@ -164,14 +165,17 @@ const ViewResponses = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white mb-2">
-          {template.title} - Responses
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-white">
+          Responses for {template?.title}
         </h1>
-        <p className="text-gray-400">
-          {responses?.length || 0} responses received
-        </p>
+        <button
+          onClick={() => exportToGoogleSheets(responses, template)}
+          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Export to Excel
+        </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
