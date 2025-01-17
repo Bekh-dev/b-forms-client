@@ -64,16 +64,7 @@ export const getUserTickets = async (email, startAt = 0) => {
     // Преобразуем данные в нужный формат
     return {
       total: response.data.total || 0,
-      tickets: response.data.tickets || response.data.tickets.map(ticket => ({
-        id: ticket.id,
-        key: ticket.key,
-        summary: ticket.summary,
-        description: ticket.description,
-        priority: ticket.priority,
-        status: ticket.status,
-        created: new Date(ticket.created).toLocaleString(),
-        updated: new Date(ticket.updated).toLocaleString()
-      }))
+      tickets: response.data.tickets || []
     };
   } catch (error) {
     console.error('Error fetching tickets:', {
