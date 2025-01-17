@@ -61,13 +61,13 @@ const FormResponses = () => {
     loadData();
   }, [dispatch, id]);
 
-  const responses = useSelector(state => state.form.responses);
+  const responses = useSelector(state => state.form.responses) || [];
 
   // Filter and search responses
   const filteredResponses = responses.filter(response => {
     // Apply search
     if (searchTerm) {
-      const searchString = JSON.stringify(response.data).toLowerCase();
+      const searchString = JSON.stringify(response.data || {}).toLowerCase();
       if (!searchString.includes(searchTerm.toLowerCase())) {
         return false;
       }
@@ -75,7 +75,7 @@ const FormResponses = () => {
 
     // Apply filters
     for (const [fieldId, value] of Object.entries(filters)) {
-      if (value && response.data[fieldId] !== value) {
+      if (value && (!response.data || response.data[fieldId] !== value)) {
         return false;
       }
     }
@@ -93,12 +93,16 @@ const FormResponses = () => {
       }]
     };
 
+    if (!responses || !field) return data;
+
     if (field.type === 'select' || field.type === 'radio') {
       // Count occurrences of each option
       const counts = {};
       responses.forEach(response => {
-        const value = response.data[field.id];
-        counts[value] = (counts[value] || 0) + 1;
+        if (response.data && response.data[field.id]) {
+          const value = response.data[field.id];
+          counts[value] = (counts[value] || 0) + 1;
+        }
       });
 
       // Sort by count descending

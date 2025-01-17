@@ -37,15 +37,16 @@ const CreateTemplate = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    isPublic: false,
+    isPublished: false,
     questions: []
   });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const fieldName = name === 'isPublic' ? 'isPublished' : name;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [fieldName]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -110,7 +111,7 @@ const CreateTemplate = () => {
     const templateData = {
       title: formData.title,
       description: formData.description,
-      isPublished: formData.isPublic,
+      isPublished: formData.isPublished,
       fields: formData.questions.map(({ id, ...question }) => ({
         type: question.type,
         label: question.label,
@@ -180,12 +181,12 @@ const CreateTemplate = () => {
           />
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center mb-6">
           <input
             type="checkbox"
             id="isPublic"
             name="isPublic"
-            checked={formData.isPublic}
+            checked={formData.isPublished}
             onChange={handleChange}
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
