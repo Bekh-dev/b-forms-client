@@ -22,7 +22,7 @@ const TicketList = () => {
 
       try {
         console.log('Fetching tickets for user:', user.email);
-        const response = await getUserTickets(user.email);
+        const response = await getUserTickets();
         console.log('Tickets response:', response);
         
         if (!response) {

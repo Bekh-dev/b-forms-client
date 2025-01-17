@@ -13,7 +13,7 @@ const TicketsList = () => {
 
   const loadTickets = async () => {
     try {
-      const response = await getUserTickets(user.email, page * 10);
+      const response = await getUserTickets(page * 10);
       if (response.issues.length < 10) {
         setHasMore(false);
       }

@@ -51,10 +51,10 @@ export const createJiraTicket = async ({ summary, description, pageUrl, priority
   }
 };
 
-export const getUserTickets = async (email, startAt = 0) => {
+export const getUserTickets = async (startAt = 0) => {
   try {
-    console.log('Fetching tickets for email:', email, 'from URL:', `${API_URL}/jira/tickets/${encodeURIComponent(email)}`);
-    const response = await api.get(`/jira/tickets/${encodeURIComponent(email)}`, {
+    console.log('Fetching tickets from URL:', `${API_URL}/jira/tickets`);
+    const response = await api.get('/jira/tickets', {
       params: {
         startAt
       },
