@@ -108,10 +108,18 @@ const CreateTemplate = () => {
 
     // Prepare data for submission
     const templateData = {
-      ...formData,
-      questions: formData.questions.map(({ id, ...rest }) => ({
-        ...rest,
-        options: rest.options.filter(Boolean) // Remove empty options
+      title: formData.title,
+      description: formData.description,
+      isPublished: formData.isPublic,
+      fields: formData.questions.map(({ id, ...question }) => ({
+        type: question.type,
+        label: question.label,
+        placeholder: question.placeholder || '',
+        required: question.required || false,
+        options: (question.options || []).filter(Boolean).map(opt => ({
+          label: opt,
+          value: opt
+        }))
       }))
     };
 
