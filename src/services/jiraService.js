@@ -12,6 +12,17 @@ const api = axios.create({
   }
 });
 
+const getAuthConfig = () => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    withCredentials: true
+  };
+};
+
 export const createJiraTicket = async ({ summary, description, reporter, pageUrl, priority = 'Medium' }) => {
   try {
     const data = {
@@ -23,8 +34,7 @@ export const createJiraTicket = async ({ summary, description, reporter, pageUrl
     };
 
     console.log('Creating ticket with data:', data);
-
-    const response = await api.post('/jira/tickets', data);
+    const response = await api.post('/jira/tickets', data, getAuthConfig());
     console.log('Ticket created:', response.data);
     return response.data;
   } catch (error) {
@@ -42,7 +52,8 @@ export const getUserTickets = async (email, startAt = 0) => {
     const response = await api.get(`/jira/tickets/${encodeURIComponent(email)}`, {
       params: {
         startAt
-      }
+      },
+      ...getAuthConfig()
     });
     console.log('Tickets response:', response.data);
     
