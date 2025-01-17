@@ -84,6 +84,51 @@ export const deleteTemplate = createAsyncThunk(
   }
 );
 
+export const updateTemplate = createAsyncThunk(
+  'templates/updateTemplate',
+  async ({ id, templateData }, { rejectWithValue }) => {
+    try {
+      console.log('Updating template:', id, templateData);
+      const response = await api.put(`/api/templates/${id}`, templateData);
+      console.log('Template updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update template:', error.response?.data);
+      return rejectWithValue(error.response?.data?.message || 'Failed to update template');
+    }
+  }
+);
+
+export const shareTemplate = createAsyncThunk(
+  'templates/shareTemplate',
+  async ({ templateId, email, accessType }, { rejectWithValue }) => {
+    try {
+      console.log('Sharing template:', templateId, email, accessType);
+      const response = await api.post(`/api/templates/${templateId}/share`, { email, accessType });
+      console.log('Template shared successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to share template:', error.response?.data);
+      return rejectWithValue(error.response?.data?.message || 'Failed to share template');
+    }
+  }
+);
+
+export const generateShareableLink = createAsyncThunk(
+  'templates/generateShareableLink',
+  async (templateId, { rejectWithValue }) => {
+    try {
+      console.log('Generating shareable link for template:', templateId);
+      const response = await api.post(`/api/templates/${templateId}/shareable-link`);
+      console.log('Shareable link generated:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to generate link:', error.response?.data);
+      return rejectWithValue(error.response?.data?.message || 'Failed to generate link');
+    }
+  }
+);
+
 const templateSlice = createSlice({
   name: 'templates',
   initialState,
@@ -172,6 +217,61 @@ const templateSlice = createSlice({
       .addCase(deleteTemplate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Failed to delete template';
+      })
+
+    // Update Template
+      .addCase(updateTemplate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateTemplate.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentTemplate = action.payload;
+        state.templates = state.templates.map(template => 
+          template._id === action.payload._id ? action.payload : template
+        );
+        state.error = null;
+      })
+      .addCase(updateTemplate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to update template';
+      })
+
+    // Share Template
+      .addCase(shareTemplate.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(shareTemplate.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.currentTemplate && state.currentTemplate._id === action.payload._id) {
+          state.currentTemplate = action.payload;
+        }
+        state.templates = state.templates.map(template => 
+          template._id === action.payload._id ? action.payload : template
+        );
+        state.error = null;
+      })
+      .addCase(shareTemplate.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to share template';
+      })
+
+    // Generate Shareable Link
+      .addCase(generateShareableLink.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(generateShareableLink.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.currentTemplate) {
+          state.currentTemplate.shareableLink = action.payload.shareableLink;
+        }
+        state.error = null;
+      })
+      .addCase(generateShareableLink.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Failed to generate link';
       });
   }
 });
