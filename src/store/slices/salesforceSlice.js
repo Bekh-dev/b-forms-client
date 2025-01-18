@@ -6,9 +6,12 @@ export const syncWithSalesforce = createAsyncThunk(
   'salesforce/sync',
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/salesforce/sync', userData);
+      console.log('Syncing with Salesforce:', userData);
+      const response = await api.post('/salesforce/sync', userData);
+      console.log('Salesforce sync response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Salesforce sync error:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || 'Failed to sync with Salesforce');
     }
   }
@@ -18,9 +21,12 @@ export const getSalesforceStatus = createAsyncThunk(
   'salesforce/status',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/salesforce/status');
+      console.log('Getting Salesforce status');
+      const response = await api.get('/salesforce/status');
+      console.log('Salesforce status response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Salesforce status error:', error.response?.data || error.message);
       return rejectWithValue(error.response?.data?.message || 'Failed to get Salesforce status');
     }
   }
@@ -50,6 +56,7 @@ const salesforceSlice = createSlice({
         state.loading = false;
         state.synced = true;
         state.lastSync = new Date().toISOString();
+        state.account = action.payload.account;
       })
       .addCase(syncWithSalesforce.rejected, (state, action) => {
         state.loading = false;
